@@ -9,6 +9,7 @@ import { OtpService } from '@app/otp';
 import { Response } from 'express';
 import { ApiResponse } from 'common/types';
 import { CONSTANTS } from 'common/constants';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -80,10 +81,6 @@ export class AuthService {
 
     const tokens = await this.userService.getTokens(user.email, user.hash);
 
-    await this.userService.updateUser(user.email, {
-      refresh_token: tokens.refresh_token,
-    });
-
     res.cookie('ref', tokens.refresh_token, {
       maxAge: CONSTANTS.default_refresh_cookie_expiry,
       httpOnly: true,
@@ -113,7 +110,7 @@ export class AuthService {
 
     if (!user) throw new NotFoundException('Invalid Credentials');
 
-    await this.userService.updateUser(user.email, { hash: '' });
+    await this.userService.updateUser(user.email, { hash: uuidv4() });
 
     res.clearCookie('ref', { maxAge: 0, httpOnly: true });
     res.clearCookie('acc', { maxAge: 0, httpOnly: true });

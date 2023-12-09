@@ -5,6 +5,7 @@ import { decryptData, encryptData } from 'helper/encryption';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { CONSTANTS } from 'common/constants';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -99,7 +100,9 @@ export class UserService {
 
     if (!verifiedPassword) throw new NotFoundException('Invalid Credentials');
 
-    return { email: user.email, hash: user.hash };
+    const updatedUser = await this.updateUser(user.email, { hash: uuidv4() });
+
+    return { email: updatedUser.email, hash: updatedUser.hash };
   }
 
   /**

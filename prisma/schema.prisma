@@ -15,7 +15,6 @@ model User {
   email         String   @unique
   password      String
   role          Role     @default(USER)
-  refresh_token String?
   hash          String   @default(uuid())
   Otp           Otp?
   created_at    DateTime @default(now())
