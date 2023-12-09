@@ -26,7 +26,7 @@ export class AuthService {
    * @returns Promise<Response>
    */
   async createUser(payload: Signup): Promise<ApiResponse> {
-    const userExists = await this.userService.getUser(payload.email);
+    const userExists = await this.userService.getUserByEmail(payload.email);
 
     if (userExists) throw new BadRequestException('Email already exists');
 
@@ -106,7 +106,7 @@ export class AuthService {
    * @returns Promise<ApiResponse>
    */
   async logout(email: string, res: Response): Promise<ApiResponse> {
-    const user = await this.userService.getUser(email, { active: true });
+    const user = await this.userService.getUserByEmail(email, { active: true });
 
     if (!user) throw new NotFoundException('Invalid Credentials');
 

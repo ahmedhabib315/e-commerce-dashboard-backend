@@ -22,7 +22,7 @@ export class UserService {
    * @param whereOptions
    * @returns
    */
-  async getUser(email: string, whereOptions?: any): Promise<User> {
+  async getUserByEmail(email: string, whereOptions?: any): Promise<User> {
     if (whereOptions) {
       return await this.prisma.user.findFirst({
         where: {
@@ -50,7 +50,7 @@ export class UserService {
 
     const user = await this.prisma.user.create({
       data: {
-        email: payload.email,
+        ...payload,
         password: hashed_password,
         active: false,
       },
@@ -196,5 +196,29 @@ export class UserService {
       refresh_token: await this.getRefreshToken(email, hash),
       access_token: await this.getAccessToken(email, hash),
     };
+  }
+
+  async getAllUsers(whereOptions?: any): Promise<any[]> {
+    if (!whereOptions) {
+      return await this.prisma.user.findMany({
+        select: {
+          email: true,
+          role: true,
+          active: true,
+          created_at: true,
+          updated_at: true,
+        },
+      });
+    }
+    return await this.prisma.user.findMany({
+      where: whereOptions,
+      select: {
+        email: true,
+        role: true,
+        active: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
   }
 }
