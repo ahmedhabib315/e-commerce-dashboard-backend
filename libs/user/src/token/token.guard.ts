@@ -16,6 +16,14 @@ export class TokenGuard implements CanActivate {
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
   ) {}
+
+  /**
+   * 
+   * Validate Request for end point
+   * 
+   * @param context 
+   * @returns 
+   */
   async canActivate(context: ExecutionContext): Promise<any> {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
@@ -34,6 +42,16 @@ export class TokenGuard implements CanActivate {
     return true;
   }
 
+  /**
+   * 
+   * Verify Access and Refresh Tokens on request
+   * 
+   * @param acc 
+   * @param ref 
+   * @param request 
+   * @param response 
+   * @returns 
+   */
   async checkTokens(acc, ref, request, response) {
     try {
       const acc_token_payload = await this.userService.verifyAccessToken(acc);

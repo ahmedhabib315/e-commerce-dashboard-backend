@@ -2,12 +2,20 @@ import { PrismaService } from '@app/prisma';
 import { Injectable } from '@nestjs/common';
 import { generateOtp } from 'helper/generate-otp';
 import { addMinutes } from 'date-fns';
+import { Otp, User } from '@prisma/client';
 
 @Injectable()
 export class OtpService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createOtp(email: string) {
+  /**
+   *
+   * Create a new OTP for Specified User
+   *
+   * @param email
+   * @returns Promise<Otp>
+   */
+  async createOtp(email: string): Promise<Otp> {
     return await this.prisma.otp.create({
       data: {
         userEmail: email,
@@ -17,6 +25,14 @@ export class OtpService {
     });
   }
 
+  /**
+   *
+   * Verify the provided OTP and return status
+   *
+   * @param email
+   * @param otp
+   * @returns Promise<boolean>
+   */
   async verifyOtp(email: string, otp: string): Promise<boolean> {
     const savedOtp = await this.prisma.otp.findFirst({
       where: {
@@ -37,10 +53,8 @@ export class OtpService {
           expiry: new Date(),
         },
       });
-
       return true;
     }
-
     return false;
   }
 }

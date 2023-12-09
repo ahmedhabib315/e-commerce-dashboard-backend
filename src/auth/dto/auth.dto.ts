@@ -1,5 +1,5 @@
-import { IsEmail, IsEnum, IsString, MinLength, isString } from "class-validator";
-import { UserRole } from "../enum/auth.enum";
+import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
+import { UserRole } from '../enum/auth.enum';
 
 export class Signup {
   @IsEmail()
@@ -8,6 +8,9 @@ export class Signup {
   @IsString()
   @MinLength(8)
   password: string;
+
+  @IsEnum(UserRole)
+  role?: UserRole;
 }
 
 export class VerifyOtp {

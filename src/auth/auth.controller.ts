@@ -26,8 +26,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(TokenGuard)
-  async logout(@GetTokenData('email') email: string){
-    console.log('::::email:::',email);
-
+  async logout(@GetTokenData('email') email: string, @Res({ passthrough: true }) response: Response){
+    return await this.authService.logout(email, response);
   }
 }
