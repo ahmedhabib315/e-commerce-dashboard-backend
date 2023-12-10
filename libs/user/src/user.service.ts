@@ -28,12 +28,14 @@ export class UserService {
         where: {
           ...whereOptions,
           email: email,
+          isDeleted: false,
         },
       });
     }
     return await this.prisma.user.findFirst({
       where: {
         email: email,
+        isDeleted: false,
       },
     });
   }
@@ -45,15 +47,15 @@ export class UserService {
    * @param payload
    * @returns
    */
-  async createUser(payload: CreateUser): Promise<User> {
+  async createUser(payload: CreateUser, active: boolean): Promise<User> {
     const hashed_password = await encryptData(payload.password);
 
     const user = await this.prisma.user.create({
       data: {
         ...payload,
         password: hashed_password,
-        active: false,
-        isDeleted: false
+        active: active,
+        isDeleted: false,
       },
     });
 
@@ -74,6 +76,7 @@ export class UserService {
     return await this.prisma.user.update({
       where: {
         email: email,
+        isDeleted: false,
       },
       data: data,
     });
@@ -92,6 +95,7 @@ export class UserService {
       where: {
         email: email,
         active: true,
+        isDeleted: false,
       },
     });
 
@@ -109,7 +113,7 @@ export class UserService {
   /**
    *
    * Get Access Token
-   * 
+   *
    *
    * @param email
    * @param hash
@@ -203,6 +207,9 @@ export class UserService {
   async getAllUsers(whereOptions?: any): Promise<any[]> {
     if (!whereOptions) {
       return await this.prisma.user.findMany({
+        where: {
+          isDeleted: false,
+        },
         select: {
           email: true,
           role: true,
@@ -210,10 +217,13 @@ export class UserService {
           created_at: true,
           updated_at: true,
         },
+        orderBy: {
+          email: 'asc',
+        },
       });
     }
     return await this.prisma.user.findMany({
-      where: whereOptions,
+      where: { ...whereOptions, isDeleted: false },
       select: {
         email: true,
         role: true,

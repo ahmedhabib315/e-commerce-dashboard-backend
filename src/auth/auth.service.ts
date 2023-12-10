@@ -30,7 +30,7 @@ export class AuthService {
 
     if (userExists) throw new BadRequestException('Email already exists');
 
-    const newUser = await this.userService.createUser(payload);
+    const newUser = await this.userService.createUser(payload, false);
 
     const otp = await this.otpService.createOtp(newUser.email);
 
