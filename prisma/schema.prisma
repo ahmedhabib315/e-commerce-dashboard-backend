@@ -21,21 +21,10 @@ model User {
   updated_at  DateTime      @updatedAt
   active      Boolean
   isDeleted   Boolean
-  UserDetails UserDetails[]
 
   @@index([id, email])
   @@map("users")
 }
-
-model UserDetails {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [user_id], references: [id])
-  user_id   Int
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-}
-
 model Otp {
   id         Int      @id @default(autoincrement())
   user       User     @relation(fields: [userEmail], references: [email])
