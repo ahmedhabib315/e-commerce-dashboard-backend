@@ -53,6 +53,7 @@ export class UserService {
         ...payload,
         password: hashed_password,
         active: false,
+        isDeleted: false
       },
     });
 
@@ -108,6 +109,7 @@ export class UserService {
   /**
    *
    * Get Access Token
+   * 
    *
    * @param email
    * @param hash
