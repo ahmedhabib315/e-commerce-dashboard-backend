@@ -12,6 +12,9 @@ export class Signup {
   @IsEnum(UserRole)
   @IsOptional()
   role?: UserRole;
+
+  @IsString()
+  name: string;
 }
 
 export class VerifyOtp {
@@ -21,6 +24,11 @@ export class VerifyOtp {
   @IsString()
   @MinLength(4)
   otp: string;
+}
+
+export class GenerateOtp {
+  @IsEmail()
+  email: string;
 }
 
 export class SignIn {

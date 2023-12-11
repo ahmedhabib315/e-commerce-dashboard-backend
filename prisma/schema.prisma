@@ -11,37 +11,37 @@ datasource db {
 }
 
 model User {
-  id          Int         @id @default(autoincrement())
-  email       String      @unique
-  password    String
-  role        Role        @default(USER)
-  hash        String      @default(uuid())
-  Otp         Otp?
-  created_at  DateTime    @default(now())
-  updated_at  DateTime    @updatedAt
-  active      Boolean
-  isDeleted   Boolean
-  Activity    Activity[]
-  Project     Project[]
-  Task        Task[]
-  UserDetails UserDetail?
-  teamId      Int?
-  Team        Team?       @relation(fields: [teamId], references: [id])
+  id         Int         @id @default(autoincrement())
+  email      String      @unique
+  password   String
+  role       Role        @default(USER)
+  hash       String      @default(uuid())
+  Otp        Otp[]
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  active     Boolean
+  isDeleted  Boolean
+  Activity   Activity[]
+  Project    Project[]
+  Task       Task[]
+  UserDetail UserDetail?
+  teamId     Int?
+  Team       Team?       @relation(fields: [teamId], references: [id])
 
   @@index([id, email, role, active, isDeleted])
-  @@map("users")
+  @@map("Users")
 }
 
 model UserDetail {
   id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [user_email], references: [email])
-  user_email String   @unique
+  user       User     @relation(fields: [email], references: [email])
+  email      String   @unique
   name       String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  @@index([id, name, user_email])
-  @@map("userDetails")
+  @@index([id, name, email])
+  @@map("UserDetails")
 }
 
 model Team {
@@ -50,26 +50,26 @@ model Team {
   projects Project[]
 
   @@index([id])
-  @@map("teams")
+  @@map("Teams")
 }
 
 model Otp {
   id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [user_email], references: [email])
-  user_email String   @unique
+  user       User     @relation(fields: [email], references: [email])
+  email      String
   otp        String
   expiry     DateTime
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  @@index([id, otp, user_email, expiry])
-  @@map("otp")
+  @@index([id, otp, email, expiry])
+  @@map("Otps")
 }
 
 model Project {
   id                 Int        @id @default(autoincrement())
-  user               User       @relation(fields: [user_email], references: [email])
-  user_email         String
+  user               User       @relation(fields: [email], references: [email])
+  email              String
   name               String
   description        String
   planned_start_time DateTime?
@@ -83,14 +83,14 @@ model Project {
   Team               Team?      @relation(fields: [teamId], references: [id])
   teamId             Int?
 
-  @@index([id, user_email, name, teamId])
-  @@map("projects")
+  @@index([id, email, name, teamId])
+  @@map("Projects")
 }
 
 model Activity {
   id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [user_email], references: [email])
-  user_email  String
+  user        User     @relation(fields: [email], references: [email])
+  email       String
   project     Project  @relation(fields: [project_id], references: [id])
   project_id  Int      @unique
   description String
@@ -98,16 +98,16 @@ model Activity {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  @@index([id, user_email, project_id])
-  @@map("activities")
+  @@index([id, email, project_id])
+  @@map("Activities")
 }
 
 model Task {
   id                 Int       @id @default(autoincrement())
   project            Project   @relation(fields: [project_id], references: [id])
   project_id         Int       @unique
-  user               User      @relation(fields: [user_email], references: [email])
-  user_email         String
+  user               User      @relation(fields: [email], references: [email])
+  email              String
   name               String
   description        String
   planned_start_time DateTime?
@@ -121,8 +121,8 @@ model Task {
   created_at         DateTime  @default(now())
   updated_at         DateTime  @updatedAt
 
-  @@index([id, project_id, user_email, name, status, priority])
-  @@map("tasks")
+  @@index([id, project_id, email, name, status, priority])
+  @@map("Tasks")
 }
 
 enum Role {

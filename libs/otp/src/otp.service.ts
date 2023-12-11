@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { generateOtp } from 'helper/generate-otp';
 import { addMinutes } from 'date-fns';
 import { Otp, User } from '@prisma/client';
+import { CONSTANTS } from 'common/constants';
 
 @Injectable()
 export class OtpService {
@@ -16,11 +17,24 @@ export class OtpService {
    * @returns Promise<Otp>
    */
   async createOtp(email: string): Promise<Otp> {
+    const oldOtps = await this.getOtps({ email });
+
+    if (oldOtps && oldOtps.length > 0) {
+      await this.prisma.otp.updateMany({
+        where: {
+          email,
+        },
+        data: {
+          expiry: new Date(),
+        },
+      });
+    }
+
     return await this.prisma.otp.create({
       data: {
-        user_email: email,
+        email: email,
         otp: generateOtp(),
-        expiry: addMinutes(new Date(), 15),
+        expiry: addMinutes(new Date(), CONSTANTS.otp_expiry_minutes),
       },
     });
   }
@@ -36,7 +50,7 @@ export class OtpService {
   async verifyOtp(email: string, otp: string): Promise<boolean> {
     const savedOtp = await this.prisma.otp.findFirst({
       where: {
-        user_email: email,
+        email,
         otp: otp,
         expiry: {
           gt: new Date(),
@@ -56,5 +70,18 @@ export class OtpService {
       return true;
     }
     return false;
+  }
+
+  /**
+   * 
+   * Get Old OTPs according to filters
+   * 
+   * @param whereOptions 
+   * @returns 
+   */
+  async getOtps(whereOptions: any): Promise<Otp[]> {
+    return await this.prisma.otp.findMany({
+      where: whereOptions,
+    });
   }
 }

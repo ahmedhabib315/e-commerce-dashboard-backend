@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { SignIn, Signup, VerifyOtp } from './dto/auth.dto';
+import { GenerateOtp, SignIn, Signup, VerifyOtp } from './dto/auth.dto';
 import { UserService } from '@app/user';
 import { OtpService } from '@app/otp';
 import { Response } from 'express';
@@ -49,8 +49,17 @@ export class AuthService {
    * @returns  Promise<ApiResponse>
    */
   async verifyOtp(payload: VerifyOtp): Promise<ApiResponse> {
+    const userExists = await this.userService.getUserByEmail(payload.email, {
+      isDeleted: false,
+    });
+
+    if (!userExists) throw new BadRequestException('Email does not exists');
+
+    if (userExists.active)
+      throw new BadRequestException('User already verified');
+
     const otpVerified = await this.otpService.verifyOtp(
-      payload.email,
+      userExists.email,
       payload.otp,
     );
 
@@ -62,6 +71,29 @@ export class AuthService {
       status: true,
       message: 'User Verified successfully',
       data: { verified: true },
+    };
+  }
+
+  /**
+   *
+   * Generate OTP
+   *
+   * @param payload
+   * @returns  Promise<ApiResponse>
+   */
+  async generateOtp(payload: GenerateOtp): Promise<ApiResponse> {
+    const userExists = await this.userService.getUserByEmail(payload.email, {
+      isDeleted: false,
+    });
+
+    if (!userExists) throw new BadRequestException('Email does not exists');
+
+    const otp = await this.otpService.createOtp(userExists.email);
+
+    return {
+      status: true,
+      message: 'OTP generated successfully',
+      data: { otp },
     };
   }
 

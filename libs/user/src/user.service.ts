@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUser } from './dto/user.dto';
 import { decryptData, encryptData } from 'helper/encryption';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { User, UserDetail } from '@prisma/client';
 import { CONSTANTS } from 'common/constants';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -40,26 +40,34 @@ export class UserService {
 
   /**
    *
-   * Create User
+   * Create User and User Details
    *
    * @param payload
    * @returns
    */
-  async createUser(payload: CreateUser, active: boolean): Promise<User> {
+  async createUser(payload: CreateUser, active: boolean): Promise<UserDetail> {
     const hashed_password = await encryptData(payload.password);
+    const { password, name, email, ...rest } = payload;
 
     const user = await this.prisma.user.create({
       data: {
-        ...payload,
+        ...rest,
+        email: email,
         password: hashed_password,
         active: active,
         isDeleted: false,
       },
     });
 
-    delete user.password;
+    const userDetail = await this.prisma.userDetail.create({
+      data: {
+        email,
+        name,
+      },
+    });
 
-    return user;
+
+    return userDetail;
   }
 
   /**
