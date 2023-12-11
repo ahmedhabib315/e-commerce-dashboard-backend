@@ -25,6 +25,8 @@ model User {
   Project     Project[]
   Task        Task[]
   UserDetails UserDetail?
+  teamId      Int?
+  Team        Team?       @relation(fields: [teamId], references: [id])
 
   @@index([id, email, role, active])
   @@map("users")
@@ -40,6 +42,12 @@ model UserDetail {
 
   @@index([id, name, user_email])
   @@map("userDetails")
+}
+
+model Team {
+  id       Int       @id @default(autoincrement())
+  user     User[]
+  projects Project[]
 }
 
 model Otp {
@@ -69,6 +77,8 @@ model Project {
   updated_at         DateTime   @updatedAt
   Task               Task[]
   Activity           Activity[]
+  Team               Team?      @relation(fields: [teamId], references: [id])
+  teamId             Int?
 
   @@index([id, user_email, name])
   @@map("projects")
@@ -114,4 +124,5 @@ model Task {
 enum Role {
   USER
   ADMIN
+  MANAGER
 }
