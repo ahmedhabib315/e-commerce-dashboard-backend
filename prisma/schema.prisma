@@ -11,30 +11,104 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  email       String        @unique
+  id          Int         @id @default(autoincrement())
+  email       String      @unique
   password    String
-  role        Role          @default(USER)
-  hash        String        @default(uuid())
+  role        Role        @default(USER)
+  hash        String      @default(uuid())
   Otp         Otp?
-  created_at  DateTime      @default(now())
-  updated_at  DateTime      @updatedAt
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
   active      Boolean
   isDeleted   Boolean
+  Activity    Activity[]
+  Project     Project[]
+  Task        Task[]
+  UserDetails UserDetail?
 
-  @@index([id, email])
+  @@index([id, email, role, active])
   @@map("users")
 }
+
+model UserDetail {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_email], references: [email])
+  user_email String   @unique
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([id, name, user_email])
+  @@map("userDetails")
+}
+
 model Otp {
   id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userEmail], references: [email])
-  userEmail  String   @unique
+  user       User     @relation(fields: [user_email], references: [email])
+  user_email String   @unique
   otp        String
   expiry     DateTime
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  @@index([id, otp, userEmail])
+  @@index([id, otp, user_email])
+  @@map("otp")
+}
+
+model Project {
+  id                 Int        @id @default(autoincrement())
+  user               User       @relation(fields: [user_email], references: [email])
+  user_email         String
+  name               String
+  description        String
+  planned_start_time DateTime?
+  planned_end_time   DateTime?
+  actual_start_time  DateTime?
+  actual_end_time    DateTime?
+  created_at         DateTime   @default(now())
+  updated_at         DateTime   @updatedAt
+  Task               Task[]
+  Activity           Activity[]
+
+  @@index([id, user_email, name])
+  @@map("projects")
+}
+
+model Activity {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [user_email], references: [email])
+  user_email  String
+  project     Project  @relation(fields: [project_id], references: [id])
+  project_id  Int      @unique
+  description String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([id, user_email, project_id])
+  @@map("activities")
+}
+
+model Task {
+  id                 Int       @id @default(autoincrement())
+  project            Project   @relation(fields: [project_id], references: [id])
+  project_id         Int       @unique
+  user               User      @relation(fields: [user_email], references: [email])
+  user_email         String
+  name               String
+  description        String
+  planned_start_time DateTime?
+  planned_end_time   DateTime?
+  planned_budget     Int?
+  actual_start_time  DateTime?
+  actual_end_time    DateTime?
+  actual_budget      Int?
+  status             Int       @default(1)
+  priority           Int       @default(1)
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  @@index([id, project_id, user_email, name])
+  @@map("tasks")
 }
 
 enum Role {
