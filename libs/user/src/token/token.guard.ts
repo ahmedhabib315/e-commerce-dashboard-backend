@@ -64,6 +64,7 @@ export class TokenGuard implements CanActivate {
       const acc_token_payload = await this.userService.verifyAccessToken(acc);
       const filters: any = {
         hash: acc_token_payload.hash,
+        isDeleted: false,
       };
       if (roles && roles.length > 0) filters.role = roles[0];
       const user = await this.userService.getUserByEmail(
@@ -81,6 +82,7 @@ export class TokenGuard implements CanActivate {
             await this.userService.verifyRefreshToken(ref);
           const filters: any = {
             hash: ref_token_payload.hash,
+            isDeleted: false,
           };
           if (roles && roles.length > 0) filters.role = roles[0];
           const user = await this.userService.getUserByEmail(

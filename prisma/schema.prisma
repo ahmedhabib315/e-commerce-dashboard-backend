@@ -28,7 +28,7 @@ model User {
   teamId      Int?
   Team        Team?       @relation(fields: [teamId], references: [id])
 
-  @@index([id, email, role, active])
+  @@index([id, email, role, active, isDeleted])
   @@map("users")
 }
 
@@ -48,6 +48,9 @@ model Team {
   id       Int       @id @default(autoincrement())
   user     User[]
   projects Project[]
+
+  @@index([id])
+  @@map("teams")
 }
 
 model Otp {
@@ -59,7 +62,7 @@ model Otp {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  @@index([id, otp, user_email])
+  @@index([id, otp, user_email, expiry])
   @@map("otp")
 }
 
@@ -80,7 +83,7 @@ model Project {
   Team               Team?      @relation(fields: [teamId], references: [id])
   teamId             Int?
 
-  @@index([id, user_email, name])
+  @@index([id, user_email, name, teamId])
   @@map("projects")
 }
 
@@ -91,6 +94,7 @@ model Activity {
   project     Project  @relation(fields: [project_id], references: [id])
   project_id  Int      @unique
   description String
+  date        DateTime @default(now())
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
@@ -117,7 +121,7 @@ model Task {
   created_at         DateTime  @default(now())
   updated_at         DateTime  @updatedAt
 
-  @@index([id, project_id, user_email, name])
+  @@index([id, project_id, user_email, name, status, priority])
   @@map("tasks")
 }
 

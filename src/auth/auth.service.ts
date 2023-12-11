@@ -106,7 +106,10 @@ export class AuthService {
    * @returns Promise<ApiResponse>
    */
   async logout(email: string, res: Response): Promise<ApiResponse> {
-    const user = await this.userService.getUserByEmail(email, { active: true });
+    const user = await this.userService.getUserByEmail(email, {
+      active: true,
+      isDeleted: false,
+    });
 
     if (!user) throw new NotFoundException('Invalid Credentials');
 

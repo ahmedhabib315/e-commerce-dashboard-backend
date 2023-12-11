@@ -18,7 +18,7 @@ export class OtpService {
   async createOtp(email: string): Promise<Otp> {
     return await this.prisma.otp.create({
       data: {
-        userEmail: email,
+        user_email: email,
         otp: generateOtp(),
         expiry: addMinutes(new Date(), 15),
       },
@@ -36,7 +36,7 @@ export class OtpService {
   async verifyOtp(email: string, otp: string): Promise<boolean> {
     const savedOtp = await this.prisma.otp.findFirst({
       where: {
-        userEmail: email,
+        user_email: email,
         otp: otp,
         expiry: {
           gt: new Date(),

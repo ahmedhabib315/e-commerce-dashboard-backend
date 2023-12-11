@@ -32,8 +32,9 @@ export class AdminService {
   }
 
   async deleteUser(payload: DeleteUser, ownEmail: string) {
-    const userExists = await this.userService.getUserByEmail(payload.email);
-    console.log('::::ownEmail::::::', ownEmail);
+    const userExists = await this.userService.getUserByEmail(payload.email, {
+      isDeleted: false,
+    });
 
     if (!userExists) throw new NotFoundException('User does not exist');
 

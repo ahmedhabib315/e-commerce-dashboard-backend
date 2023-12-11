@@ -28,14 +28,12 @@ export class UserService {
         where: {
           ...whereOptions,
           email: email,
-          isDeleted: false,
         },
       });
     }
     return await this.prisma.user.findFirst({
       where: {
         email: email,
-        isDeleted: false,
       },
     });
   }
